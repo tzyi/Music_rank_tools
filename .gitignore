@@ -1,0 +1,7 @@
+.env
+client_secret.json
+
+venv/
+__pycache__/
+
+create_yt_playlist/
