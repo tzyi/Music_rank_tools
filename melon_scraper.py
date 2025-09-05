@@ -21,40 +21,47 @@ def scrape_melon_chart():
         songs = []
         
         # Try different selectors for song titles and artists
-        song_titles = soup.select('div.ellipsis.rank01 a')
-        artist_spans = soup.select('div.ellipsis.rank02 span a')
+        chart_rows = soup.find_all('tr')
         
-        # Alternative approach - look for table rows
-        if not song_titles:
-            chart_rows = soup.find_all('tr')
-            for row in chart_rows:
-                song_elem = row.find('div', class_='ellipsis rank01')
-                artist_elem = row.find('div', class_='ellipsis rank02')
+        for row in chart_rows:
+            song_elem = row.find('div', class_='ellipsis rank01')
+            artist_elem = row.find('div', class_='ellipsis rank02')
+            
+            if song_elem and artist_elem:
+                song_link = song_elem.find('a')
                 
-                if song_elem and artist_elem:
-                    song_link = song_elem.find('a')
+                if song_link:
+                    song_title = song_link.get_text().strip()
+                    
+                    # Get all artist links from the artist element
                     artist_links = artist_elem.find_all('a')
+                    if artist_links:
+                        # Extract all artist names and remove duplicates while preserving order
+                        artists = []
+                        seen = set()
+                        for a in artist_links:
+                            artist_name = a.get_text().strip()
+                            if artist_name and artist_name not in seen:
+                                artists.append(artist_name)
+                                seen.add(artist_name)
+                        artist_str = '/'.join(artists) if len(artists) > 1 else artists[0] if artists else ""
+                    else:
+                        # Fallback to getting text from span elements
+                        artist_spans = artist_elem.find_all('span')
+                        if artist_spans:
+                            artists = []
+                            seen = set()
+                            for span in artist_spans:
+                                span_text = span.get_text().strip()
+                                if span_text and span_text not in ['|', ',', '&', ''] and span_text not in seen:
+                                    artists.append(span_text)
+                                    seen.add(span_text)
+                            artist_str = '/'.join(artists) if artists else artist_elem.get_text().strip()
+                        else:
+                            artist_str = artist_elem.get_text().strip()
                     
-                    if song_link and artist_links:
-                        song_title = song_link.get_text().strip()
-                        artists = [a.get_text().strip() for a in artist_links]
-                        
-                        if song_title and artists:
-                            artist_str = ','.join(artists)
-                            songs.append(f"{song_title} - {artist_str}")
-        else:
-            # Process the found elements
-            for i, title_elem in enumerate(song_titles):
-                try:
-                    song_title = title_elem.get_text().strip()
-                    
-                    # Find corresponding artist
-                    if i < len(artist_spans):
-                        artist_name = artist_spans[i].get_text().strip()
-                        if song_title and artist_name:
-                            songs.append(f"{song_title} - {artist_name}")
-                except:
-                    continue
+                    if song_title and artist_str:
+                        songs.append(f"{song_title} - {artist_str}")
         
         return songs
         
