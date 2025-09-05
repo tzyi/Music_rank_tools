@@ -6,6 +6,9 @@
 
 1. **melon_scraper.py** - 爬取 Melon 排行榜
 2. **create_yt_playlist.py** - 從 Melon 排行榜創建 YouTube 播放清單
+3. **txt_playlist.py** - 使用 rank.txt 文件創建 YouTube 播放清單
+
+
 
 ## 安裝
 
@@ -51,6 +54,44 @@ python create_yt_playlist.py -n "我的韓流音樂清單"
 ```bash
 python create_yt_playlist.py --help
 ```
+
+### 3. rank.txt導入播放清單
+
+#### 使用預設的 rank.txt 文件
+```bash
+  python txt_playlist.py
+```
+
+#### 指定其他txt文件
+```bash
+python txt_playlist.py songs.txt
+```
+
+
+#### 自訂播放清單名稱
+```bash
+python txt_playlist.py --name "我的音樂清單"
+python txt_playlist.py -n "我的音樂清單"
+```
+
+#### 限制歌曲數量 (只取前50首)
+```bash
+python txt_playlist.py --limit 50
+python txt_playlist.py -l 50
+```
+
+#### 組合使用
+```bash
+python txt_playlist.py rank.txt --name "Melon Top 100" --limit 50
+```
+
+Features:
+
+1. 自動格式解析: 支援你的 rank.txt 格式 (數字→歌手 - 歌名)
+2. 命令行參數: 可自訂播放清單名稱和歌曲數量限制
+3. 錯誤處理: 包含完整的錯誤處理和進度顯示
+4. API限制處理: 自動處理YouTube API限制和重試機制
+
 
 ## 注意事項
 
